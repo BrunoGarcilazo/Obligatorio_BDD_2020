@@ -23,6 +23,7 @@ public class login_utils {
      * @param btn1 user
      * @param btn2 password
      * @return 
+     * @throws java.sql.SQLException 
      */
     public boolean login_attempt(String btn1,String btn2) throws SQLException{
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){ 
@@ -35,29 +36,31 @@ public class login_utils {
             while (resultSet.next()){
                 System.out.println("-------");
                 System.out.println(resultSet.getString("alias"));
+                System.out.println(btn1);
                 System.out.println(resultSet.getString("password"));
+                System.out.println(btn2);
                 
-                if(btn2.compareTo(resultSet.getString("alias"))==0 && btn1.compareTo(resultSet.getString("password"))==0){
-                    success = true;                   
-                    data[0]=resultSet.getString("alias");
-                    data[1]=resultSet.getString("password");
-                    data[2]=resultSet.getString("ci");
-                    data[3]=resultSet.getString("estado");
-                    break;
-
+                if(btn1.compareTo(resultSet.getString("alias"))==0 && btn2.compareTo(resultSet.getString("password"))==0){
+                    success = true;         
+//                    data[0]=resultSet.getString("alias");
+//                    data[1]=resultSet.getString("password");
+//                    data[2]=resultSet.getString("ci");
+//                    data[3]=resultSet.getString("estado");
                     
-                                      
+                    if(success){
+                        main_user_screen user = new main_user_screen();
+                        user.setVisible(true);
+                        return true;
+                    }                                   
                 }                   
             }
-            user_info_screen user = new user_info_screen();
-            user.show_user_info(data);
-            user.setVisible(true);
-            return true;
+
         }         
         catch (SQLException e) {
             System.out.println("Connection failure.");
             return false;
-        }       
+        } 
+        return false;
     }
     
 }
