@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package obligatorio_bdd_2020;
+package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,7 +28,7 @@ public class login_utils {
      * @throws java.sql.SQLException 
      */
     public boolean login_attempt(String btn1,String btn2) throws SQLException{
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){ 
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){             
             String query = "SELECT * FROM usuario WHERE alias = ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, btn1);
