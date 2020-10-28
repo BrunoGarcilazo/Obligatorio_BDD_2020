@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package utils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +12,8 @@ import java.sql.SQLException;
 import utils.BCrypt;
 import java.sql.Statement;
 import javax.swing.JFrame;
+import obligatorio_bdd_2020.app_select_screen;
+
 
 /**
  * 
@@ -28,13 +29,18 @@ public class login_utils {
      * @throws java.sql.SQLException 
      */
     public boolean login_attempt(String btn1,String btn2) throws SQLException{
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){             
-            String query = "SELECT * FROM usuario WHERE alias = ?)";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, btn1);
-            ResultSet rs = statement.executeQuery();           
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){ 
+            
+            String query = "SELECT * FROM usuario";
+            PreparedStatement statement = connection.prepareStatement(query);           
+            ResultSet rs = statement.executeQuery(); 
+            
+            //BCrypt.checkpw(btn2,rs.getString("password")
             while(rs.next()){
                 if(rs.getString("alias").compareTo(btn1)==0 && BCrypt.checkpw(btn2,rs.getString("password"))){
+                    System.out.println("Datos correctos");
+                    app_select_screen after_login = new app_select_screen();
+                    after_login.setVisible(true);
                     return true;
                 }
             }

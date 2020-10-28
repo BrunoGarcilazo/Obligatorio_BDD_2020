@@ -287,7 +287,7 @@ public class register_screen extends javax.swing.JFrame {
             data[5] = sex;
             data[6] = birthdate;
             data[7] = username;
-            data[8] = Arrays.toString(password);
+            data[8] = new String(jPasswordField2.getPassword());
             
             try {
                 register_utils.new_registration(data);

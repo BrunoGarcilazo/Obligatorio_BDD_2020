@@ -58,8 +58,16 @@ public class register_utils {
             
             int resultado = register_statement.executeUpdate();
             
-            //register_utils.new_user(data);
-       
+                   
+            String user_query = "INSERT INTO usuario(alias,ci,quienlocreo,estado,password) VALUES(?,?,?,?,?);";
+            PreparedStatement user_statement = connection.prepareStatement(user_query);
+            user_statement.setString(1,data[7]);
+            user_statement.setInt(2,Integer.parseInt(data[0]));
+            user_statement.setString(3,"none");
+            user_statement.setString(4,"En Espera");
+            user_statement.setString(5,BCrypt.hashpw(data[8],BCrypt.gensalt()));
+            
+            int user_query_result = user_statement.executeUpdate();
         }         
         catch (SQLException e) {
             e.printStackTrace();
@@ -70,22 +78,5 @@ public class register_utils {
         
     }
     
-    public static boolean new_user(String[] data) throws SQLException{
-        try(Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            String user_query = "INSERT INTO usuario VALUES(alias=?,ci=?,quienlocreo=?,estado=?,password=?);";
-            PreparedStatement user_statement = connection.prepareStatement(user_query);
-            user_statement.setString(1,data[7]);
-            user_statement.setInt(2,Integer.parseInt(data[0]));
-            user_statement.setString(3,"none");
-            user_statement.setString(4,"En Espera");
-            user_statement.setString(5,BCrypt.hashpw(data[8],BCrypt.gensalt()));
-            ResultSet user_query_result = user_statement.executeQuery();
-            return true;            
-        }catch (SQLException e) {
-            System.out.println("Connection failure.");
-            return false;
-        }  
-        
-    }
-    
+
 }
