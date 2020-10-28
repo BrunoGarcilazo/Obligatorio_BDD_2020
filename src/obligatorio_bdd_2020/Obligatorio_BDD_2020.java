@@ -24,10 +24,12 @@ public class Obligatorio_BDD_2020{
      */
     public static void main(String[] args) throws SQLException{
         
-        new main_screen().setVisible(true);
+        
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
+            new main_screen().setVisible(true);
             System.out.println("Successful connection");
         }catch (SQLException e){
+
             System.out.println("Connection failure.");           
         }                 
     }
