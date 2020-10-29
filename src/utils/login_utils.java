@@ -35,11 +35,11 @@ public class login_utils {
             PreparedStatement statement = connection.prepareStatement(query);           
             ResultSet rs = statement.executeQuery(); 
             
-            //BCrypt.checkpw(btn2,rs.getString("password")
+            
             while(rs.next()){
                 if(rs.getString("alias").compareTo(btn1)==0 && BCrypt.checkpw(btn2,rs.getString("password"))){
                     System.out.println("Datos correctos");
-                    app_select_screen after_login = new app_select_screen();
+                    app_select_screen after_login = new app_select_screen(btn1);
                     after_login.setVisible(true);
                     return true;
                 }

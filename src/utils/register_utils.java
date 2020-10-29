@@ -69,7 +69,7 @@ public class register_utils {
             
             int user_query_result = user_statement.executeUpdate();
         }         
-        catch (SQLException e) {
+        catch (SQLException e){
             e.printStackTrace();
             System.out.println("Connection failure.");
             return false;
