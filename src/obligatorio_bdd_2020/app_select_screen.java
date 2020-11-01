@@ -133,13 +133,26 @@ public class app_select_screen extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+     * Ingresa a una Aplicacion seleccionada en el JComboBox1
+     * @param evt 
+     */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        jComboBox1.removeAllItems();
+        String app = (String) jComboBox1.getSelectedItem();
+        if(!app.isEmpty()){           
+            main_app_screen main_app = new main_app_screen(app,jLabel4.getText());
+            main_app.setVisible(true);
+            
+        }
+        
+      
+        
         
     }//GEN-LAST:event_jButton1ActionPerformed
-
+/**
+ * Actualiza la lista de Apps disponibles para el usuario en el jComboBox1
+ * @param evt 
+ */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         jComboBox1.removeAllItems();
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
