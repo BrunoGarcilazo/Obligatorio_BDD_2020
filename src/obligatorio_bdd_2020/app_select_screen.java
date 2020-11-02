@@ -54,6 +54,11 @@ public class app_select_screen extends javax.swing.JFrame {
         jLabel2.setText("Available Apps");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Connect");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -90,18 +95,14 @@ public class app_select_screen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 430, Short.MAX_VALUE)
                         .addComponent(jLabel4))
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
                             .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
                                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jButton1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jButton2)))
+                            .addComponent(jButton2))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -141,13 +142,9 @@ public class app_select_screen extends javax.swing.JFrame {
         String app = (String) jComboBox1.getSelectedItem();
         if(!app.isEmpty()){           
             main_app_screen main_app = new main_app_screen(app,jLabel4.getText());
-            main_app.setVisible(true);
-            
-        }
-        
-      
-        
-        
+            System.out.println(jLabel4.getText() + ", " + app);
+            main_app.setVisible(true);            
+        }     
     }//GEN-LAST:event_jButton1ActionPerformed
 /**
  * Actualiza la lista de Apps disponibles para el usuario en el jComboBox1
@@ -167,6 +164,10 @@ public class app_select_screen extends javax.swing.JFrame {
             System.out.println("Connection failure.");           
         } 
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments

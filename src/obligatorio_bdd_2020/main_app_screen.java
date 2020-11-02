@@ -10,13 +10,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import utils.queries;
 
 /**
  *
  * @author bruno
  */
 public class main_app_screen extends javax.swing.JFrame {
-
+    
+    private String appName;
+    private String userName;
+    private String menuName;
     /**
      * Creates new form main_app_screen
      */
@@ -25,24 +29,12 @@ public class main_app_screen extends javax.swing.JFrame {
     }
     public main_app_screen(String appName,String userName){
         initComponents();
-        jLabel1.setText(appName);
-        
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            String query_2 = "SELECT x.* FROM menu x WHERE x.idapp = ?";
-            PreparedStatement statement = connection.prepareStatement(query_2);
-            statement.setString(1,appName);           
-            ResultSet rs = statement.executeQuery();       
-            while(rs.next()){
-                jComboBox1.addItem(rs.getString("descripcion"));
-            }
-            
-            query_2 = "SELECT x.* FROM rol x WHERE "
-                    + "EXISTS x.idrol = (SELECT y.* FROM rolesusuario y WHERE y.alias = ?) AND"
-                    + " EXISTS x.idrol = (SELECT "
-        }catch (SQLException e){
-            System.out.println("Connection failure.");           
-        } 
-        
+        this.appName = appName;
+        this.userName = userName;
+        jLabel1.setText(appName+"");
+        jLabel5.setText(userName+"");  
+        jComboBox1.removeAllItems();
+        jComboBox2.removeAllItems();
     }
 
     /**
@@ -64,6 +56,8 @@ public class main_app_screen extends javax.swing.JFrame {
         jComboBox2 = new javax.swing.JComboBox<>();
         jToggleButton1 = new javax.swing.JToggleButton();
         jToggleButton2 = new javax.swing.JToggleButton();
+        jLabel5 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,8 +76,22 @@ public class main_app_screen extends javax.swing.JFrame {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jToggleButton1.setText("Confirmar Menu");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
 
         jToggleButton2.setText("Confirmar Rol");
+
+        jLabel5.setText("jLabel5");
+
+        jButton1.setText("Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -94,7 +102,9 @@ public class main_app_screen extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(527, 527, 527)
-                        .addComponent(jLabel1))
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel5))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -110,17 +120,24 @@ public class main_app_screen extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jToggleButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jToggleButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jToggleButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
                 .addGap(705, 705, 705))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -137,11 +154,70 @@ public class main_app_screen extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton2))
-                .addContainerGap(459, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 421, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    /**
+     * Se confirma el Menu que el Usuario quiere ingresar.
+     * @param evt 
+     */
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        // TODO add your handling code here:
+        jComboBox2.removeAllItems();
+        
+        String menu = (String) jComboBox1.getSelectedItem(); // Nombre del Menu
+        this.menuName = menu;
+
+        
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
+            String query_2 = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp = ? and x.idmenu = ?))";
+            PreparedStatement statement = connection.prepareStatement(query_2);
+            
+            System.out.println(userName);
+            System.out.println(queries.getIdApp(appName));
+            System.out.println(queries.getIdMenu((String)jComboBox1.getSelectedItem()));
+            
+            statement.setString(1,userName);
+            statement.setInt(2,queries.getIdApp(appName)); 
+            statement.setInt(3,queries.getIdMenu((String)jComboBox1.getSelectedItem()));
+            ResultSet rs = statement.executeQuery();       
+            while(rs.next()){              
+                jComboBox2.addItem(queries.getNombreRol(rs.getInt("idrol")));
+            }   
+        }catch (SQLException e){
+            System.out.println("Connection failure.");           
+        }
+        
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    /**
+     * Boton "Update"
+     * @param evt 
+     */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
+            System.out.println("Se conecto en el boton de hacer Update");
+            String query_2 = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp in (SELECT z.idapp FROM aplicacion z where z.nombreapp = ?)))";
+            PreparedStatement statement = connection.prepareStatement(query_2);
+            //"SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp = ? and x.idmenu = ?))"
+            
+            statement.setString(1,userName);           
+            statement.setString(2,appName);       
+            
+            ResultSet rs = statement.executeQuery();       
+            while(rs.next()){
+                //System.out.println(rs.getInt("idmenu"));
+                String descMenu = queries.getDescMenu(rs.getInt("idmenu"));
+                jComboBox1.addItem(descMenu);
+                //jComboBox1.addItem(Integer.toString(rs.getInt("idmenu")));
+            }   
+        }catch (SQLException e){
+            System.out.println("Connection failure.");           
+        }   
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -179,12 +255,14 @@ public class main_app_screen extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JToggleButton jToggleButton1;
