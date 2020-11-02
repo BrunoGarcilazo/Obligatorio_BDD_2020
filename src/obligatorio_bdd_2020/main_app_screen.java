@@ -21,6 +21,7 @@ public class main_app_screen extends javax.swing.JFrame {
     private String appName;
     private String userName;
     private String menuName;
+    private String rolName;
     /**
      * Creates new form main_app_screen
      */
@@ -31,6 +32,7 @@ public class main_app_screen extends javax.swing.JFrame {
         initComponents();
         this.appName = appName;
         this.userName = userName;
+        jButton2.setVisible(false);
         jLabel1.setText(appName+"");
         jLabel5.setText(userName+"");  
         jComboBox1.removeAllItems();
@@ -58,6 +60,7 @@ public class main_app_screen extends javax.swing.JFrame {
         jToggleButton2 = new javax.swing.JToggleButton();
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -83,6 +86,11 @@ public class main_app_screen extends javax.swing.JFrame {
         });
 
         jToggleButton2.setText("Confirmar Rol");
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("jLabel5");
 
@@ -90,6 +98,13 @@ public class main_app_screen extends javax.swing.JFrame {
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Conectar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
             }
         });
 
@@ -128,7 +143,9 @@ public class main_app_screen extends javax.swing.JFrame {
                 .addGap(705, 705, 705))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -154,7 +171,9 @@ public class main_app_screen extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 421, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 371, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
         );
@@ -184,6 +203,7 @@ public class main_app_screen extends javax.swing.JFrame {
             statement.setString(1,userName);
             statement.setInt(2,queries.getIdApp(appName)); 
             statement.setInt(3,queries.getIdMenu((String)jComboBox1.getSelectedItem()));
+            this.menuName = (String)jComboBox1.getSelectedItem();
             ResultSet rs = statement.executeQuery();       
             while(rs.next()){              
                 jComboBox2.addItem(queries.getNombreRol(rs.getInt("idrol")));
@@ -218,6 +238,23 @@ public class main_app_screen extends javax.swing.JFrame {
             System.out.println("Connection failure.");           
         }   
     }//GEN-LAST:event_jButton1ActionPerformed
+    /**
+     * Boton para confirmar Rol.
+     * @param evt 
+     */
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        this.rolName = (String) jComboBox2.getSelectedItem();
+        jButton2.setVisible(true);
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+/**
+ *  Boton Conectar (abre la pantalla principal del Menu)
+ * @param evt 
+ */
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        main_menu_screen main_menu = new main_menu_screen(this.rolName,this.menuName,this.userName,this.appName);
+        main_menu.setVisible(true);
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -256,6 +293,7 @@ public class main_app_screen extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
