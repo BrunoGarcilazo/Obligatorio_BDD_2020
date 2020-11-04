@@ -5,6 +5,10 @@
  */
 package obligatorio_bdd_2020;
 
+import consultasMenu.ver_Users_Menu;
+import java.util.HashSet;
+import utils.queries;
+
 /**
  *
  * @author bruno
@@ -23,7 +27,7 @@ public class main_menu_screen extends javax.swing.JFrame {
     private String userName;
     private String appName;
     
-    public main_menu_screen() {
+    public main_menu_screen(){
         initComponents();
     }
     public main_menu_screen(String rol,String menu,String user,String app){
@@ -32,7 +36,7 @@ public class main_menu_screen extends javax.swing.JFrame {
         this.menuName = menu;
         this.userName = user;
         this.appName = app;
-        
+        jComboBox1.removeAllItems();
         jLabel1.setText(menuName);
         jLabel2.setText(rolName);
         jLabel3.setText(userName);
@@ -53,6 +57,8 @@ public class main_menu_screen extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -66,6 +72,20 @@ public class main_menu_screen extends javax.swing.JFrame {
         jLabel4.setText("Lista de Acciones");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jButton1.setText("Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("OK");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -82,9 +102,14 @@ public class main_menu_screen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 423, Short.MAX_VALUE)
                         .addComponent(jLabel3))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton2)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -101,12 +126,45 @@ public class main_menu_screen extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(454, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 410, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * Boton que actualiza la lista de acciones que el usuario posee en este Menu.
+     * @param evt 
+     */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String[] temp = queries.getPermisosPersona(userName,queries.getIdMenu(menuName),queries.getIdRol(rolName));
+        for (int i = 0; i < 5; i++){
+            String permiso = temp[i];
+            if(permiso != null){
+                jComboBox1.addItem(permiso);
+            }            
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+    /**
+     * Boton de Activacion a la accion que dio el usuario.
+     * @param evt 
+     */
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String accion = (String) jComboBox1.getSelectedItem();
+        if(accion == "ver"){
+            //Mostrar los Alias de los Usuarios que tienen acceso a este Menu.
+            int idRol = queries.getIdRol(rolName);            
+            HashSet<String> hash = queries.getAliases(idRol);
+            ver_Users_Menu pantalla = new ver_Users_Menu(hash);
+            pantalla.setVisible(true);
+            
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -144,6 +202,8 @@ public class main_menu_screen extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
