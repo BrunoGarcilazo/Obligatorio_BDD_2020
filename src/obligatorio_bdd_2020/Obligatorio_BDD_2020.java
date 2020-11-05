@@ -17,22 +17,22 @@ import java.sql.Statement;
  */
 public class Obligatorio_BDD_2020{
     
+    private Connection connection_db = null;
+    
+    
+    public Obligatorio_BDD_2020(){
+        
+    }
+    
     public static login_utils login = new login_utils();
 
+    
     /**
      * @param args the command line arguments
      * @throws java.sql.SQLException
      */
-    public static void main(String[] args) throws SQLException{
-        
-        
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            new main_screen().setVisible(true);
-            System.out.println("Successful connection");
-        }catch (SQLException e){
-
-            System.out.println("Connection failure.");           
-        }                 
+    public static void main(String[] args) throws SQLException{        
+        Database database = new Database();
     }
 
     

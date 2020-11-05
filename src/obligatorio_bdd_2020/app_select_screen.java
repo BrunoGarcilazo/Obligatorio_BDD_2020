@@ -15,8 +15,9 @@ import java.sql.SQLException;
  *
  * @author bruno
  */
-public class app_select_screen extends javax.swing.JFrame {
+public class app_select_screen extends javax.swing.JFrame{
 
+    private Connection connection_db;
     /**
      * Creates new form app_select_screen
      */
