@@ -5,9 +5,15 @@
  */
 package obligatorio_bdd_2020;
 
-import consultasMenu.modificar_Menu;
+import consultasMenu.buscar_Users_Menu;
+import consultasMenu.modificar_roles_menu;
+import consultasMenu.modificar_usuarios_Menu;
+
 import consultasMenu.ver_Users_Menu;
+import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utils.queries;
 
 /**
@@ -165,10 +171,34 @@ public class main_menu_screen extends javax.swing.JFrame {
             int idRol = db.getIdRol(rolName);            
             HashSet<String> hash = db.getAliases(idRol);
             ver_Users_Menu pantalla = new ver_Users_Menu(hash);
-            pantalla.setVisible(true);            
+            pantalla.setVisible(true);  
+            
         }else if(accion == "crear"){
-            int idRol = db.getIdApp(rolName);
-            modificar_Menu mm = new modificar_Menu();
+            if(this.rolName.compareTo("Administrador de Usuarios")==0){
+                modificar_usuarios_Menu mm = new modificar_usuarios_Menu(appName,userName,rolName,menuName,db);    
+                mm.setVisible(true);
+            }else if(this.rolName == "Administrador de Roles"){
+                try {
+                    modificar_roles_menu mr = new modificar_roles_menu(appName,userName,rolName,menuName,db);
+                    mr.setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(main_menu_screen.class.getName()).log(Level.SEVERE, null, ex);
+                }               
+            }
+            
+        }else if(accion == "buscar"){
+            buscar_Users_Menu bum = new buscar_Users_Menu(appName,userName,rolName,menuName,db);
+            bum.setVisible(true);
+            
+        }else if(accion == "modificar"){
+            modificar_roles_menu mr;
+            try {
+                mr = new modificar_roles_menu(appName,userName,rolName,menuName,db);
+                mr.setVisible(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(main_menu_screen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             
         }
     }//GEN-LAST:event_jButton2ActionPerformed

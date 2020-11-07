@@ -354,5 +354,138 @@ public class Database {
             return false;
         }
     }
+    /**
+     * Devuelve todos los Usuarios (con su Rol) que pertenecen a un Menu dado por parametro
+     * @param idmenu
+     * @return 
+     */
+    public ResultSet obtenerUsuariosMenu(int idmenu){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.user,x.idrol FROM menurol x WHERE x.idmenu = ?";
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1, idmenu);
+            ResultSet rs = stmt.executeQuery();
+            
+            return rs;
+            
+            
+        }catch(SQLException e){
+            return null;
+        }
+        
+    }
     
+    /**
+     * 
+     * @param subAdmin  el responsable de esta accion
+     * @param nuevoRol  el Rol que sera asignado a nuevoUser
+     * @param idmenu    el Menu a donde se asignara
+     * @param nuevoUser el Usuario que sera asignado a su nuevo Rol 
+     * @return 
+     */
+    public boolean asignarRolUsuarioMenu(String subAdmin,String nuevoRol,int idmenu,String nuevoUser){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "INSERT INTO public.menurol(idmenu, idrol, estado, admincrea, adminautoriza,user) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1, idmenu);
+            stmt.setInt(2,this.getIdRol(nuevoRol));
+            stmt.setString(3,"En Espera");
+            stmt.setString(4,subAdmin);
+            stmt.setString(5,"N/A");
+            stmt.setString(6,nuevoUser);
+            int resultado = stmt.executeUpdate();
+            return resultado == 1;       
+            
+        }catch(SQLException e){
+            return false;
+        }      
+    }
+    /**
+     * Funcion que le quita un Rol a un Usuario en un Menu particular.
+     * @param subAdmin
+     * @param nuevoRol
+     * @param idmenu
+     * @param nuevoUser
+     * @return 
+     * @throws java.sql.SQLException 
+     */
+    public boolean quitarRolUsuarioMenu(String subAdmin,int nuevoRol,int idmenu,String nuevoUser) throws SQLException{
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "DELETE FROM menurol WHERE idmenu = ? AND user = ? AND idrol = ?;";
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1,idmenu);
+            stmt.setString(2,nuevoUser);
+            stmt.setInt(3,nuevoRol);            
+            int resultado = stmt.executeUpdate();
+            
+            return resultado >= 1;
+        }catch(SQLException e){
+            return false;
+            
+        }        
+    }
+    /**
+     * Asigna un nuevo Rol a un Usuario en un Menu determinado.
+     * @return 
+     */
+    public boolean asignarRolUsuarioMenu(String subAdmin,int nuevoRol,int idmenu,String nuevoUser){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "INSERT INTO menurol(idmenu, idrol, estado, admincrea, adminautoriza,user) VALUES (?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1,idmenu);
+            stmt.setInt(2,nuevoRol);
+            stmt.setString(3,"En Espera");
+            stmt.setString(4,subAdmin); 
+            stmt.setString(5,"N/A");
+            stmt.setString(6,nuevoUser);
+            int resultado = stmt.executeUpdate();
+            return resultado >= 1;
+        }catch(SQLException e){
+            return false;
+            
+        } 
+       
+    }
+    /**
+     * 
+     * @param subAdmin
+     * @param idmenu
+     * @param usuarioTarget
+     * @return 
+     */
+    public boolean buscarUsuarioEnMenu(String subAdmin,int idmenu,String usuarioTarget){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.user FROM menurol x WHERE x.idmenu = ? AND x.user = ?";            
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1, idmenu);
+            stmt.setString(2,usuarioTarget);           
+            ResultSet rs = stmt.executeQuery();
+            
+            return rs.next();
+            
+        }catch(SQLException e){
+            return false;
+            
+        } 
+    }
+
+    public boolean quitarUsuarioMenu(String appname, String username, String rolname, String menuname, String alias) {
+        
+        //AUDITORIA .... 
+        
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "UPDATE public.menurol SET estado=?,WHERE idmenu = ? AND user = ?;";
+            PreparedStatement stmt = c.prepareStatement(query);        
+            stmt.setString(2,"En Espera");
+            stmt.setInt(2,this.getIdMenu(menuname));
+            stmt.setString(3,alias);
+
+            int resultado = stmt.executeUpdate();
+            return resultado >= 1;
+        }catch(SQLException e){
+            return false;
+            
+        }         
+    }
 }
