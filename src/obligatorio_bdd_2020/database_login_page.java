@@ -6,6 +6,9 @@
 package obligatorio_bdd_2020;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -14,18 +17,17 @@ import java.sql.Connection;
 public class database_login_page extends javax.swing.JFrame {
 
     
-    private final Connection c;
+    private Database db;
     /**
      * Creates new form database_login_page
      */
     public database_login_page() {
-        this.c = null;
         initComponents();
     }
     
-    public database_login_page(Connection c){
-        this.c = null;
+    public database_login_page(Connection c,Database db){       
         initComponents();
+        this.db = db;
     }
 
     /**
@@ -143,7 +145,27 @@ public class database_login_page extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        String url;
+        String username;
+        String password;
+        if(!jTextField1.getText().isEmpty() && !jTextField2.getText().isEmpty()){
+            url = jTextField1.getText();
+            username = jTextField2.getText();
+            password = new String(jPasswordField1.getPassword());
+            try {
+                if(db.conectarse(url, username, password)){
+                    main_screen ms = new main_screen(db);
+                    ms.setVisible(true);
+                }                              
+            } catch (SQLException ex) {
+                Logger.getLogger(database_login_page.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                
+            
+            
+        }else{
+            jLabel5.setText("Completa todos los datos");           
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

@@ -11,11 +11,18 @@ package obligatorio_bdd_2020;
  */
 public class main_screen extends javax.swing.JFrame {
 
+    
+    private Database db;
     /**
      * Creates new form main_screen
      */
     public main_screen() {
         initComponents();
+    }
+    
+    public main_screen(Database db){
+        initComponents();
+        this.db = db;
     }
 
     /**
@@ -80,7 +87,7 @@ public class main_screen extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         this.setVisible(false);
-        new login_screen().setVisible(true);
+        new login_screen(db).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

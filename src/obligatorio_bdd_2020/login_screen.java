@@ -15,12 +15,18 @@ import java.util.logging.Logger;
  * @author bruno
  */
 public class login_screen extends javax.swing.JFrame {
-
+    
+    private Database db;
     /**
      * Creates new form login_screen
      */
     public login_screen() {
         initComponents();
+    }
+    
+    public login_screen(Database db){
+        initComponents();
+        this.db = db;
     }
 
     /**
@@ -103,7 +109,11 @@ public class login_screen extends javax.swing.JFrame {
         String user = jTextField1.getText();
         String password = new String(jPasswordField1.getPassword());
         try {
-            Obligatorio_BDD_2020.login.login_attempt(user,password);
+            if(db.login(user, password)){
+                app_select_screen after_login = new app_select_screen(user,this.db);
+                after_login.setVisible(true);
+            }
+            //Obligatorio_BDD_2020.login.login_attempt(user,password);
         } catch (SQLException ex){
             Logger.getLogger(login_screen.class.getName()).log(Level.SEVERE, null, ex);
         }

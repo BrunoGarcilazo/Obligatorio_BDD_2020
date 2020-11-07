@@ -17,7 +17,7 @@ import java.sql.SQLException;
  */
 public class app_select_screen extends javax.swing.JFrame{
 
-    private Connection connection_db;
+    private Database db;
     /**
      * Creates new form app_select_screen
      */
@@ -26,9 +26,10 @@ public class app_select_screen extends javax.swing.JFrame{
         
         initComponents();
     }
-    public app_select_screen(String alias) throws SQLException{
+    public app_select_screen(String alias,Database db) throws SQLException{
         initComponents();    
         jLabel4.setText(alias);
+        this.db = db;
         
     }
     /**
