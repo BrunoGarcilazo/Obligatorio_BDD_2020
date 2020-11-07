@@ -5,6 +5,7 @@
  */
 package obligatorio_bdd_2020;
 
+import consultasMenu.modificar_Menu;
 import consultasMenu.ver_Users_Menu;
 import java.util.HashSet;
 import utils.queries;
@@ -18,6 +19,8 @@ import utils.queries;
  */
 public class main_menu_screen extends javax.swing.JFrame {
 
+    
+    Database db;
     /**
      * Creates new form main_menu_screen
      */
@@ -30,12 +33,13 @@ public class main_menu_screen extends javax.swing.JFrame {
     public main_menu_screen(){
         initComponents();
     }
-    public main_menu_screen(String rol,String menu,String user,String app){
+    public main_menu_screen(String rol,String menu,String user,String app,Database db){
         initComponents();
         this.rolName = rol;
         this.menuName = menu;
         this.userName = user;
         this.appName = app;
+        this.db = db;
         jComboBox1.removeAllItems();
         jLabel1.setText(menuName);
         jLabel2.setText(rolName);
@@ -142,7 +146,7 @@ public class main_menu_screen extends javax.swing.JFrame {
      * @param evt 
      */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String[] temp = queries.getPermisosPersona(userName,queries.getIdMenu(menuName),queries.getIdRol(rolName));
+        String[] temp = db.getPermisosPersona(userName,db.getIdMenu(menuName),db.getIdRol(rolName));
         for (int i = 0; i < 5; i++){
             String permiso = temp[i];
             if(permiso != null){
@@ -158,10 +162,13 @@ public class main_menu_screen extends javax.swing.JFrame {
         String accion = (String) jComboBox1.getSelectedItem();
         if(accion == "ver"){
             //Mostrar los Alias de los Usuarios que tienen acceso a este Menu.
-            int idRol = queries.getIdRol(rolName);            
-            HashSet<String> hash = queries.getAliases(idRol);
+            int idRol = db.getIdRol(rolName);            
+            HashSet<String> hash = db.getAliases(idRol);
             ver_Users_Menu pantalla = new ver_Users_Menu(hash);
-            pantalla.setVisible(true);
+            pantalla.setVisible(true);            
+        }else if(accion == "crear"){
+            int idRol = db.getIdApp(rolName);
+            modificar_Menu mm = new modificar_Menu();
             
         }
     }//GEN-LAST:event_jButton2ActionPerformed

@@ -115,7 +115,8 @@ public class login_screen extends javax.swing.JFrame {
             }
             //Obligatorio_BDD_2020.login.login_attempt(user,password);
         } catch (SQLException ex){
-            Logger.getLogger(login_screen.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+            System.out.println("Login erroneo");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

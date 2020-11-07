@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utils.queries;
 
 /**
@@ -22,16 +24,18 @@ public class main_app_screen extends javax.swing.JFrame {
     private String userName;
     private String menuName;
     private String rolName;
+    private Database db;
     /**
      * Creates new form main_app_screen
      */
     public main_app_screen() {
         initComponents();
     }
-    public main_app_screen(String appName,String userName){
+    public main_app_screen(String appName,String userName,Database db){
         initComponents();
         this.appName = appName;
         this.userName = userName;
+        this.db = db;
         jButton2.setVisible(false);
         jLabel1.setText(appName+"");
         jLabel5.setText(userName+"");  
@@ -188,29 +192,17 @@ public class main_app_screen extends javax.swing.JFrame {
         // TODO add your handling code here:
         jComboBox2.removeAllItems();
         
-        String menu = (String) jComboBox1.getSelectedItem(); // Nombre del Menu
-        this.menuName = menu;
-
-        
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            String query_2 = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp = ? and x.idmenu = ?))";
-            PreparedStatement statement = connection.prepareStatement(query_2);
-            
-            System.out.println(userName);
-            System.out.println(queries.getIdApp(appName));
-            System.out.println(queries.getIdMenu((String)jComboBox1.getSelectedItem()));
-            
-            statement.setString(1,userName);
-            statement.setInt(2,queries.getIdApp(appName)); 
-            statement.setInt(3,queries.getIdMenu((String)jComboBox1.getSelectedItem()));
-            this.menuName = (String)jComboBox1.getSelectedItem();
-            ResultSet rs = statement.executeQuery();       
-            while(rs.next()){              
-                jComboBox2.addItem(queries.getNombreRol(rs.getInt("idrol")));
-            }   
-        }catch (SQLException e){
-            System.out.println("Connection failure.");           
+        this.menuName = (String) jComboBox1.getSelectedItem(); // Nombre del Menu
+        ResultSet rs = db.getRolesUsuarioApp(userName,db.getIdApp(appName),db.getIdMenu(menuName));
+        try {
+            while(rs.next()){
+                jComboBox2.addItem(db.getNombreRol(rs.getInt("idrol")));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(main_app_screen.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
         
     }//GEN-LAST:event_jToggleButton1ActionPerformed
     /**
@@ -218,25 +210,16 @@ public class main_app_screen extends javax.swing.JFrame {
      * @param evt 
      */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            System.out.println("Se conecto en el boton de hacer Update");
-            String query_2 = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp in (SELECT z.idapp FROM aplicacion z where z.nombreapp = ?)))";
-            PreparedStatement statement = connection.prepareStatement(query_2);
-            //"SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu in (SELECT x.idmenu FROM menu x WHERE x.idapp = ? and x.idmenu = ?))"
-            
-            statement.setString(1,userName);           
-            statement.setString(2,appName);       
-            
-            ResultSet rs = statement.executeQuery();       
-            while(rs.next()){
-                //System.out.println(rs.getInt("idmenu"));
-                String descMenu = queries.getDescMenu(rs.getInt("idmenu"));
-                jComboBox1.addItem(descMenu);
-                //jComboBox1.addItem(Integer.toString(rs.getInt("idmenu")));
-            }   
-        }catch (SQLException e){
-            System.out.println("Connection failure.");           
-        }   
+        jComboBox1.removeAllItems();
+        ResultSet rs = db.getMenuUsuario(userName,appName);
+        try {
+            while(rs.next()){                
+                String descMenu = db.getDescMenu(rs.getInt("idmenu"));
+                jComboBox1.addItem(descMenu);                
+            }           
+        } catch (SQLException ex) {
+            Logger.getLogger(main_app_screen.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
     /**
      * Boton para confirmar Rol.
@@ -251,7 +234,7 @@ public class main_app_screen extends javax.swing.JFrame {
  * @param evt 
  */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        main_menu_screen main_menu = new main_menu_screen(this.rolName,this.menuName,this.userName,this.appName);
+        main_menu_screen main_menu = new main_menu_screen(this.rolName,this.menuName,this.userName,this.appName,db);
         main_menu.setVisible(true);
         
     }//GEN-LAST:event_jButton2ActionPerformed

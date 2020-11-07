@@ -24,6 +24,7 @@ public class login_utils {
     /**
      * Esta horriblemente hecho. Es para probar.
      * 
+     * @param username
      * @param btn1 user
      * @param btn2 password
      * @return 
@@ -53,19 +54,23 @@ public class login_utils {
 //        return false;
 //    }
     
-    public boolean login_attempt(String username,String password,Database db) throws SQLException{
-        Connection conn = db.getConnection();
-        if(!conn.isClosed()){
-            String query = "SELECT * FROM usuario";
-            PreparedStatement statement = conn.prepareStatement(query);           
-            ResultSet rs = statement.executeQuery();
-            while(rs.next()){
-                if(rs.getString("alias").compareTo(username)==0 && BCrypt.checkpw(password,rs.getString("password"))){
-                    System.out.println("Datos correctos");                    
-                    return true;
+    public boolean login_attempt(String username,String password,Database db) throws SQLException{       
+        Connection conn = db.reConnect();
+        if(conn != null){
+           if(!conn.isClosed()){
+                String query = "SELECT * FROM usuario";
+                PreparedStatement statement = conn.prepareStatement(query);           
+                ResultSet rs = statement.executeQuery();
+                while(rs.next()){
+                    if(rs.getString("alias").compareTo(username)==0 && BCrypt.checkpw(password,rs.getString("password"))){
+                        System.out.println("Datos correctos");                    
+                        return true;
+                    }
                 }
-            }
+            } 
         }
+        
+        System.out.println("CONN CERRADA");
         return false;
         
     }

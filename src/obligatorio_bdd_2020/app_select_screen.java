@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -143,7 +145,7 @@ public class app_select_screen extends javax.swing.JFrame{
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String app = (String) jComboBox1.getSelectedItem();
         if(!app.isEmpty()){           
-            main_app_screen main_app = new main_app_screen(app,jLabel4.getText());
+            main_app_screen main_app = new main_app_screen(app,jLabel4.getText(),this.db);
             System.out.println(jLabel4.getText() + ", " + app);
             main_app.setVisible(true);            
         }     
@@ -154,17 +156,20 @@ public class app_select_screen extends javax.swing.JFrame{
  */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         jComboBox1.removeAllItems();
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")){
-            String query_2 = "SELECT x.* FROM aplicacion x WHERE EXISTS (SELECT y.* FROM usuarioapp y WHERE y.idapp = x.idapp AND y.alias = ?)";
-            PreparedStatement statement = connection.prepareStatement(query_2);
-            statement.setString(1,jLabel4.getText());
-            ResultSet rs = statement.executeQuery();       
-            while(rs.next()){
-                jComboBox1.addItem(rs.getString("nombreapp"));
+        ResultSet rs = db.getAppsDeUsuario(jLabel4.getText());
+        if(rs != null){
+            try {
+                while(rs.next()){
+                    try {
+                        jComboBox1.addItem(rs.getString("nombreapp"));
+                    } catch (SQLException ex) {
+                        Logger.getLogger(app_select_screen.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(app_select_screen.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }catch (SQLException e){
-            System.out.println("Connection failure.");           
-        } 
+        }       
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed

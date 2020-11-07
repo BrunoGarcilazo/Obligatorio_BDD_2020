@@ -25,7 +25,7 @@ public class database_login_page extends javax.swing.JFrame {
         initComponents();
     }
     
-    public database_login_page(Connection c,Database db){       
+    public database_login_page(Database db){       
         initComponents();
         this.db = db;
     }
@@ -148,6 +148,7 @@ public class database_login_page extends javax.swing.JFrame {
         String url;
         String username;
         String password;
+        
         if(!jTextField1.getText().isEmpty() && !jTextField2.getText().isEmpty()){
             url = jTextField1.getText();
             username = jTextField2.getText();
