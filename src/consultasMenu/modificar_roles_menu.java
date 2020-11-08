@@ -209,6 +209,7 @@ public class modificar_roles_menu extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String alias = jTextField1.getText();
         String nombreRol = (String) jComboBox1.getSelectedItem();
+        System.out.println(nombreRol);
         boolean usuarioValido = false;
         if(!alias.isEmpty()){
             usuarioValido = true;
@@ -229,25 +230,12 @@ public class modificar_roles_menu extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String alias = jTextField1.getText();
         String nombreRol = (String) jComboBox1.getSelectedItem();
-        int idrol = -1;
-        switch(nombreRol){
-            case "Usuario":
-                idrol = 110;
-            case "Administrador de Roles":
-                idrol = 1;
-            case "Administrador de Usuarios":
-                idrol = 2;
-            case "Editor de Roles":
-                idrol = 3;
-            case "Editor de Usuarios":
-                idrol = 4;
-            default:
-                idrol = -1;                
-        }
+        int idrol = db.getIdRol(nombreRol);
         boolean tieneEseRol = false;
         try {
+            ResultSet rs = db.obtenerUsuariosMenu(db.getIdMenu(menuname));
             while(rs.next()){
-               if((rs.getString("user").compareTo(alias)==0) && (idrol == rs.getInt(idrol))){
+               if((rs.getString("user").compareTo(alias)==0) && (idrol == rs.getInt("idrol"))){
                    tieneEseRol = true;
                    break;
                }

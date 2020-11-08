@@ -59,9 +59,15 @@ public class database_login_page extends javax.swing.JFrame {
 
         jLabel2.setText("URL");
 
+        jTextField1.setText("jdbc:postgresql://192.168.56.102:5432/tests");
+
         jLabel3.setText("Usuario");
 
+        jTextField2.setText("postgres");
+
         jLabel4.setText("Password");
+
+        jPasswordField1.setText("bruno123");
 
         jButton1.setText("Conectar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {

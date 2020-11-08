@@ -110,10 +110,15 @@ public class Database {
             ResultSet rs = statement.executeQuery();            
             while(rs.next()){
                 if(rs.getString("alias").compareTo(btn1)==0 && BCrypt.checkpw(btn2,rs.getString("password"))){
-                    System.out.println("Datos correctos");
-                    app_select_screen after_login = new app_select_screen(btn1,this);
-                    after_login.setVisible(true);
-                    return true;
+                    if(rs.getString("Estado").compareTo("Habilitado")==0){
+                        System.out.println("Datos correctos");
+                        //app_select_screen after_login = new app_select_screen(btn1,this);
+                        //after_login.setVisible(true);
+                        return true;
+                    }else{
+                        return false;
+                    }
+                    
                 }
             }
         }         
@@ -323,18 +328,16 @@ public class Database {
     
     public boolean agregarUsuarioAMenu(String appname,String username,String rolname,String menuname,String alias){
         try (Connection connection = DriverManager.getConnection(url,user,password)){
-            String query = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu = ?) AND (x.idrol = ?)";
-            int idmenu = this.getIdMenu(menuname);
-            int idrol = this.getIdRol(rolname);          
+            String query = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu = ?)";
+            int idmenu = this.getIdMenu(menuname);                    
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,alias);
-            statement.setInt(2,idmenu);
-            statement.setInt(3,idrol);            
+            statement.setInt(2,idmenu);              
             ResultSet rs = statement.executeQuery();
             if(rs.next()){ // Ya hay
                 return false;
             }else{ // No hay
-                query = "INSERT INTO public.menurol(idmenu,idrol,estado,admincrea,adminautoriza,user) VALUES (?, ?, ?, ?, ?, ?, ?);";
+                query = "INSERT INTO menurol(idmenu,idrol,estado,admincrea,adminautoriza,\"user\") VALUES (?, ?, ?, ?, ?, ?);";
                 statement = connection.prepareStatement(query);
                 statement.setInt(1,idmenu);
                 statement.setInt(2,110);
@@ -385,21 +388,34 @@ public class Database {
      */
     public boolean asignarRolUsuarioMenu(String subAdmin,String nuevoRol,int idmenu,String nuevoUser){
         try(Connection c = DriverManager.getConnection(url,user,password)){
-            String query = "INSERT INTO public.menurol(idmenu, idrol, estado, admincrea, adminautoriza,user) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?);";
-            PreparedStatement stmt = c.prepareStatement(query);
-            stmt.setInt(1, idmenu);
-            stmt.setInt(2,this.getIdRol(nuevoRol));
-            stmt.setString(3,"En Espera");
-            stmt.setString(4,subAdmin);
-            stmt.setString(5,"N/A");
-            stmt.setString(6,nuevoUser);
-            int resultado = stmt.executeUpdate();
-            return resultado == 1;       
+            String query_0 = "SELECT * FROM menurol WHERE idmenu = ? AND idrol = ? AND \"user\" = ?";
+            PreparedStatement stmt_0 = c.prepareStatement(query_0);
+            stmt_0.setInt(1,idmenu);
+            stmt_0.setInt(2,this.getIdRol(nuevoRol));
+            stmt_0.setString(3,nuevoUser);
             
+            ResultSet rs_0 = stmt_0.executeQuery();
+            if(rs_0.next()){
+                
+            }else{
+                String query = "INSERT INTO menurol(idmenu, idrol, estado, admincrea, adminautoriza,\"user\") "
+                    + "VALUES (?, ?, ?, ?, ?, ?);";
+                PreparedStatement stmt = c.prepareStatement(query);
+                stmt.setInt(1, idmenu);
+                stmt.setInt(2,this.getIdRol(nuevoRol));
+                System.out.println(this.getIdRol(nuevoRol));
+                stmt.setString(3,"En Espera");
+                stmt.setString(4,subAdmin);
+                stmt.setString(5,"DIOS");
+                stmt.setString(6,nuevoUser);
+                int resultado = stmt.executeUpdate();
+                System.out.println(resultado);
+                return (resultado >=1);            
+            }             
         }catch(SQLException e){
             return false;
-        }      
+        }
+        return false;
     }
     /**
      * Funcion que le quita un Rol a un Usuario en un Menu particular.
@@ -470,14 +486,23 @@ public class Database {
         } 
     }
 
+    /**
+     * 
+     * @param appname
+     * @param username
+     * @param rolname
+     * @param menuname
+     * @param alias
+     * @return 
+     */
     public boolean quitarUsuarioMenu(String appname, String username, String rolname, String menuname, String alias) {
         
         //AUDITORIA .... 
         
         try(Connection c = DriverManager.getConnection(url,user,password)){
-            String query = "UPDATE public.menurol SET estado=?,WHERE idmenu = ? AND user = ?;";
+            String query = "UPDATE menurol SET estado=? WHERE idmenu = ? AND \"user\" = ?;";
             PreparedStatement stmt = c.prepareStatement(query);        
-            stmt.setString(2,"En Espera");
+            stmt.setString(1,"En Espera");
             stmt.setInt(2,this.getIdMenu(menuname));
             stmt.setString(3,alias);
 
@@ -488,4 +513,50 @@ public class Database {
             
         }         
     }
+    /**
+     * Verifica si un Usuario con un Rol determinado esta habilitado para acceder a un Menu
+     * @param usuario
+     * @param menuname
+     * @param idrol
+     * @return 
+     */
+    public boolean usuarioRolMenuHabilitado(String usuario,String menuname,int idrol){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.estado FROM menurol x WHERE x.\"user\" = ? AND x.idmenu = ? AND x.idrol = ?";
+            PreparedStatement stmt = c.prepareStatement(query);        
+            stmt.setString(1,usuario);
+            stmt.setInt(2,this.getIdMenu(menuname));
+            stmt.setInt(3,idrol);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                if(rs.getString("estado").compareTo("Habilitado")==0){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }catch(SQLException e){
+            return false;
+            
+        }
+        return false;        
+    }
+    /**
+     * Dado el alias de un Usuario, devuelve un ResultSet con toda la info de la Persona.
+     * @param alias
+     * @return 
+     */
+    public ResultSet informacionPersona(String alias){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.* FROM persona x WHERE x.ci = (SELECT ci FROM usuario WHERE alias = ?)";
+            PreparedStatement stmt = c.prepareStatement(query);        
+            stmt.setString(1,alias);
+            ResultSet rs = stmt.executeQuery();           
+            return rs;
+        }catch(SQLException e){
+            return null;
+            
+        }
+    }
+    
 }

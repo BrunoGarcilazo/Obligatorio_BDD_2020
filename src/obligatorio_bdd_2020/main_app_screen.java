@@ -234,8 +234,15 @@ public class main_app_screen extends javax.swing.JFrame {
  * @param evt 
  */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        main_menu_screen main_menu = new main_menu_screen(this.rolName,this.menuName,this.userName,this.appName,db);
-        main_menu.setVisible(true);
+        int idrol = db.getIdRol(rolName);
+        boolean resultado = db.usuarioRolMenuHabilitado(userName,menuName,idrol);
+        if(resultado){
+            main_menu_screen main_menu = new main_menu_screen(this.rolName,this.menuName,this.userName,this.appName,db);
+            main_menu.setVisible(true);  
+        }else{
+            return;
+        }
+
         
     }//GEN-LAST:event_jButton2ActionPerformed
 
