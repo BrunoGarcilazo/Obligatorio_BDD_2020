@@ -5,13 +5,8 @@
  */
 package obligatorio_bdd_2020;
 
-import utils.login_utils;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import utils.BCrypt;
 /**
  *
  * @author bruno
@@ -25,7 +20,6 @@ public class Obligatorio_BDD_2020{
         
     }
     
-    public static login_utils login = new login_utils();
 
     
     /**

@@ -6,15 +6,19 @@
 package obligatorio_bdd_2020;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
 import utils.BCrypt;
-import utils.login_utils;
-import utils.queries;
-import utils.register_utils;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 /**
  *
@@ -23,9 +27,7 @@ import utils.register_utils;
 public class Database {
     //Connection connection = DriverManager.getConnection("jdbc:postgresql://192.168.56.102:5432/tests", "postgres", "bruno123")
     private Connection connection_db = null;
-    private queries querie = new queries();
-    private login_utils login = new login_utils();
-    private register_utils register = new register_utils();
+  
     private String user;
     private String password;
     private String url;
@@ -620,22 +622,29 @@ public class Database {
             stmt.setInt(3,ci);
             ResultSet rs = stmt.executeQuery();           
             if(rs.next()){
+                System.out.println("HAY UN USER");
                 return false;
             }else{
                 String user_query = "INSERT INTO usuario(alias,ci,quienlocreo,estado,password) VALUES(?,?,?,?,?);";
                 PreparedStatement user_statement = c.prepareStatement(user_query);
                 user_statement.setString(1,username);
                 user_statement.setInt(2,ci);
-                user_statement.setString(3,"DIOS");
+                if(admin.compareTo("N/A")!=0){
+                    user_statement.setString(3,admin);
+                }else{
+                    user_statement.setString(3,"N/A");
+                }
+                
                 user_statement.setString(4,"Habilitado");
                 user_statement.setString(5,BCrypt.hashpw(password,BCrypt.gensalt()));            
-                int user_query_result = user_statement.executeUpdate();
-                //AUDITORIA ....
+                crearAdutoriaEvento(admin,"N/A","Creacion de Usuario",username,"N/A","N/A","");
+                return user_statement.executeUpdate() >= 1;                                
+                
             }
         }catch(SQLException e){
             return false;           
         }         
-        return false;
+        
     }
     /**
      * Obtiene todos los Usuarios y sus Estados
@@ -707,7 +716,7 @@ public class Database {
     * Metodo que devuelve la tabla menurol entera
     * @return 
     */
-    public ResultSet getMenuRol() {
+    public ResultSet getMenuRol(){
         try(Connection c = DriverManager.getConnection(url,user,password)){
             String query = "SELECT * FROM menurol";
             PreparedStatement stmt = c.prepareStatement(query);                  
@@ -717,5 +726,175 @@ public class Database {
             return null;            
         }          
     }
+    public String maxGenericSQL(String atributo, String nombreTabla) throws SQLException{
+        String maximo="0";
+        String consultaSQL;
+        ResultSet resultado;
+        ResultSetMetaData rsmd;
+        int rows = 0;
+        int columnsNumber;
+        Statement sentencia;
+         try {
+            Class.forName("org.postgresql.Driver");
+            Connection c = DriverManager.getConnection(url,user,password);
+            sentencia = c.createStatement();
+
+            consultaSQL="SELECT "+atributo+" FROM "+nombreTabla+" WHERE "+atributo+" = ( SELECT MAX("+atributo+") FROM "+nombreTabla+");";
+            resultado=sentencia.executeQuery(consultaSQL);
+            rsmd = resultado.getMetaData();
+            columnsNumber=rsmd.getColumnCount();
+            if(resultado.next()){
+                maximo=resultado.getString(1);
+            }
+            resultado.close();
+         } catch (Exception e) {
+             System.out.println(e);
+            return null;
+         }
+         resultado.close();
+         sentencia.close();
+         return maximo;
+    }
+    
+    public void crearAdutoriaEvento(String administrador,String subadmin,String tipoevento, String aliasUsuario, String rol,String nomnbreApp,String descripcion){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query_adutoria = "INSERT INTO public.auditorias (idsuceso, idapp, fechahora, usuarioinvolucrado, admincrea,adminautoriza,tipodeevento,nombrerol) "+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            PreparedStatement stmt1 = c.prepareStatement(query_adutoria); 
+            String maximo = maxGenericSQL("idsuceso","public.auditorias");
+            int idsuceso = Integer.parseInt(maximo)+ 1;
+            stmt1.setInt(1, idsuceso);
+            stmt1.setInt(2,this.getIdApp(nomnbreApp));
+            stmt1.setDate(3,Date.valueOf(LocalDate.now()));
+            stmt1.setString(4,aliasUsuario);
+            if(subadmin.compareTo("N/A")!=0){
+                stmt1.setString(5,subadmin);
+            }else{
+                stmt1.setString(5,"N/A");
+            }
+            if(administrador.compareTo("N/A")!=0){
+                stmt1.setString(6,administrador);
+            }else{
+                stmt1.setString(6,"N/A");
+            }        
+            stmt1.setString(7,tipoevento);
+            stmt1.setString(8,rol);
+            ResultSet resultado = stmt1.executeQuery();
+            resultado.close();
+
+        }catch(SQLException e){
+            System.out.println("Error: "+ e);
+
+        }
+    }
+    
+    public String getAliasVinculoRol(int vinculo){
+        try(Connection c = DriverManager.getConnection(url,user,password)){     
+            String query = "SELECT x.* FROM menurol x WHERE x.vinculo = ?";           
+            PreparedStatement stmt = c.prepareStatement(query); 
+            stmt.setInt(1, vinculo);
+            ResultSet rs = stmt.executeQuery();           
+            if(rs.next()){
+                return rs.getString("user");
+            }else{
+                return "N/A";
+            }
+        }catch(SQLException e){
+            return null;            
+        }         
+    }
+    
+    public String getRolVinculo(int vinculo){
+        try(Connection c = DriverManager.getConnection(url,user,password)){     
+            String query = "SELECT x.* FROM menurol x WHERE x.vinculo = ?";           
+            PreparedStatement stmt = c.prepareStatement(query); 
+            stmt.setInt(1, vinculo);
+            ResultSet rs = stmt.executeQuery();           
+            if(rs.next()){
+                int rol = rs.getInt("idrol");
+                String desc = this.getNombreRol(rol);
+                return desc;
+            }else{
+                return "N/A";
+            }
+        }catch(SQLException e){
+            return null;            
+        }        
+    }
+    
+    public int getidMenuConVinculo(int vinculo){
+        try(Connection c = DriverManager.getConnection(url,user,password)){     
+            String query = "SELECT x.* FROM menurol x WHERE x.vinculo = ?";           
+            PreparedStatement stmt = c.prepareStatement(query); 
+            stmt.setInt(1, vinculo);
+            ResultSet rs = stmt.executeQuery();           
+            if(rs.next()){
+                int rol = rs.getInt("idmenu");
+                return rol;
+            }else{
+                return 0;
+            }
+        }catch(SQLException e){
+            return 0;            
+        }        
+    }
+
+    public String getNombreApp(int idmenu) {
+        try(Connection c = DriverManager.getConnection(url,user,password)){     
+            String query = "SELECT x.nombreapp FROM aplicacion x WHERE x.idapp = (SELECT y.idapp FROM menu y WHERE y.idmenu = ?)";           
+            PreparedStatement stmt = c.prepareStatement(query); 
+            stmt.setInt(1, idmenu);
+            ResultSet rs = stmt.executeQuery();           
+            if(rs.next()){
+                String app = rs.getString("nombreapp");
+                return app;
+            }else{
+                return "N/A";
+            }
+        }catch(SQLException e){
+            return "N/A";            
+        }         
+    }
+    
+    public boolean new_registration(String[] data,String admin) throws SQLException, ParseException {
+        try (Connection connection = DriverManager.getConnection(url,user,password)){                        
+            String register_query = "INSERT INTO PERSONA(ci,nombre,apellido,direccion,telefono,sexo,fecha_nac) VALUES(?,?,?,?,?,?,?);";
+            PreparedStatement register_statement = connection.prepareStatement(register_query);
+            register_statement.setInt(1, Integer.parseInt(data[0]));
+            register_statement.setString(2, data[1]);
+            register_statement.setString(3, data[2]);
+            register_statement.setString(4, data[3]);
+            register_statement.setInt(5, Integer.parseInt(data[4]));
+            register_statement.setString(6, data[5]);            
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = null;
+            try {
+                date = (Date) dateFormat.parse(data[6]);
+            }catch(ParseException e){
+            }           
+            register_statement.setDate(7,date); 
+            
+            int resultado = register_statement.executeUpdate();
+            
+                   
+            String user_query = "INSERT INTO usuario(alias,ci,quienlocreo,estado,password) VALUES(?,?,?,?,?);";
+            PreparedStatement user_statement = connection.prepareStatement(user_query);
+            user_statement.setString(1,data[7]);
+            user_statement.setInt(2,Integer.parseInt(data[0]));
+            user_statement.setString(3,"N/A");
+            user_statement.setString(4,"Habilitado");
+            user_statement.setString(5,BCrypt.hashpw(data[8],BCrypt.gensalt()));
+            crearAdutoriaEvento("N/A",admin,"Asignacion de Rol",data[2],"N/A","N/A","");
+            int user_query_result = user_statement.executeUpdate();
+        }         
+        catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Connection failure.");
+            return false;
+        }        
+        return false;
+        
+    }
+    
+    
     
 }

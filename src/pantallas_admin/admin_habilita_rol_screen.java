@@ -159,6 +159,9 @@ public class admin_habilita_rol_screen extends javax.swing.JFrame {
         boolean resultado = this.db.habilitarRolUsuarioMenu(vinculo, admin, true);
         if(resultado){
             jLabel2.setText("Rol de ese Usuario habilitado!");
+            int idmenu = db.getidMenuConVinculo(vinculo);
+            String nombreApp = db.getNombreApp(idmenu);
+            db.crearAdutoriaEvento(admin,admin,"Asignacion de Rol",db.getAliasVinculoRol(vinculo),db.getRolVinculo(vinculo),nombreApp,"");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -167,6 +170,9 @@ public class admin_habilita_rol_screen extends javax.swing.JFrame {
         boolean resultado = this.db.habilitarRolUsuarioMenu(vinculo, admin, false);
         if(resultado){
             jLabel2.setText("Rol de ese Usuario deshabilitado!");
+            int idmenu = db.getidMenuConVinculo(vinculo);
+            String nombreApp = db.getNombreApp(idmenu);
+            db.crearAdutoriaEvento(admin,admin,"Asignacion de Rol",db.getAliasVinculoRol(vinculo),db.getRolVinculo(vinculo),nombreApp,"");
         }
     }//GEN-LAST:event_jButton2ActionPerformed
     /**

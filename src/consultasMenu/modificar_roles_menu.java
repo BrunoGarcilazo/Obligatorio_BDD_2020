@@ -217,7 +217,9 @@ public class modificar_roles_menu extends javax.swing.JFrame {
         if(usuarioValido){
             boolean resultado = db.asignarRolUsuarioMenu(username,nombreRol,db.getIdMenu(menuname),alias);
             if(resultado){
-                jLabel7.setText("Rol asignado al Usuario.");
+                jLabel7.setText("Rol asignado al Usuario.");            
+                String nombreApp = db.getNombreApp(db.getIdMenu(menuname));
+                db.crearAdutoriaEvento("N/A",username,"Asignacion de Rol",alias,nombreRol,nombreApp,"");
             }else{
                 jLabel7.setText("Error.");
             }
@@ -248,6 +250,8 @@ public class modificar_roles_menu extends javax.swing.JFrame {
             int idmenu = db.getIdMenu(menuname);
             try {
                 db.quitarRolUsuarioMenu(username,idrol, idmenu,alias);
+                String nombreApp = db.getNombreApp(db.getIdMenu(menuname));
+                db.crearAdutoriaEvento("N/A",username,"Quitar Rol",alias,nombreRol,nombreApp,"");
                 jLabel7.setText("Status: Rol desvinculado del Usuario.");
             } catch (SQLException ex) {
                 Logger.getLogger(modificar_roles_menu.class.getName()).log(Level.SEVERE, null, ex);

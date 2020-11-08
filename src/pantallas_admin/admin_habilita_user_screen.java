@@ -168,7 +168,8 @@ public class admin_habilita_user_screen extends javax.swing.JFrame {
         String alias = jTextField1.getText();
         boolean result = db.habilitarUsuario(alias, admin,true);
         if(result){
-            jLabel3.setText("Usuario Habilitado");
+            jLabel3.setText("Usuario Habilitado");            
+            db.crearAdutoriaEvento(admin,admin,"Habilitar Usuario",alias,"NULL","NULL","");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
     /**
@@ -177,9 +178,10 @@ public class admin_habilita_user_screen extends javax.swing.JFrame {
      */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String alias = jTextField1.getText();
-        boolean result = db.habilitarUsuario(alias, admin,false);
+        boolean result = db.habilitarUsuario(alias,admin,false);
         if(result){
             jLabel3.setText("Usuario Deshabilitado");
+            db.crearAdutoriaEvento(admin,admin,"Deshabilitar Usuario",alias,"NULL","NULL","");
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 

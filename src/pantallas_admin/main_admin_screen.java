@@ -6,6 +6,7 @@
 package pantallas_admin;
 
 import obligatorio_bdd_2020.Database;
+import obligatorio_bdd_2020.register_screen;
 
 /**
  *
@@ -52,6 +53,11 @@ public class main_admin_screen extends javax.swing.JFrame {
         jLabel1.setText("Pantalla Principal de Administrador");
 
         jButton1.setText("Crear Persona");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Crear Usuario");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +131,8 @@ public class main_admin_screen extends javax.swing.JFrame {
      * @param evt 
      */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        crear_usuario_screen screen = new crear_usuario_screen();
+        crear_usuario_screen screen = new crear_usuario_screen(db,admin);
+        screen.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
     /**
      * Despliega pantalla para Habilitar/Deshabilitar Usuarios.
@@ -140,6 +147,15 @@ public class main_admin_screen extends javax.swing.JFrame {
         admin_habilita_rol_screen screen = new admin_habilita_rol_screen(db,admin);
         screen.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
+    /**
+     * Despliega pantalla de crear Persona
+     * @param evt 
+     */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        register_screen screen = new register_screen(db,admin);
+        screen.setVisible(true);
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments

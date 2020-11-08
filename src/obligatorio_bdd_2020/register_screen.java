@@ -5,12 +5,9 @@
  */
 package obligatorio_bdd_2020;
 
-import java.awt.Color;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
-import utils.register_utils;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,9 +20,19 @@ public class register_screen extends javax.swing.JFrame {
     /**
      * Creates new form register_screen
      */
+    
+    private Database db;
+    private String admin;
+    
     public register_screen() {
         initComponents();
     }
+
+    public register_screen(Database db,String admin) {
+        initComponents();
+        this.db = db;
+        this.admin = admin;
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -290,7 +297,7 @@ public class register_screen extends javax.swing.JFrame {
             data[8] = new String(jPasswordField2.getPassword());
             
             try {
-                register_utils.new_registration(data);
+                db.new_registration(data,admin);
             } catch (SQLException | ParseException ex) {
                 Logger.getLogger(register_screen.class.getName()).log(Level.SEVERE, null, ex);
             }
