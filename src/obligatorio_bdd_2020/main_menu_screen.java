@@ -10,6 +10,7 @@ import consultasMenu.modificar_roles_menu;
 import consultasMenu.modificar_usuarios_Menu;
 
 import consultasMenu.ver_Users_Menu;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -167,9 +168,9 @@ public class main_menu_screen extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String accion = (String) jComboBox1.getSelectedItem();
         if(accion == "ver"){
-            //Mostrar los Alias de los Usuarios que tienen acceso a este Menu.
+            //Mostrar los Usuarios que tienen acceso a este Menu.
             int idRol = db.getIdRol(rolName);            
-            HashSet<String> hash = db.getAliases(idRol);
+            HashSet<String> hash = db.getAliases(db.getIdMenu(menuName));
             ver_Users_Menu pantalla = new ver_Users_Menu(hash);
             pantalla.setVisible(true);  
             
@@ -177,7 +178,7 @@ public class main_menu_screen extends javax.swing.JFrame {
             if(this.rolName.compareTo("Administrador de Usuarios")==0){
                 modificar_usuarios_Menu mm = new modificar_usuarios_Menu(appName,userName,rolName,menuName,db);    
                 mm.setVisible(true);
-            }else if(this.rolName == "Administrador de Roles"){
+            }else if(this.rolName.compareTo("Administrador de Roles")==0){
                 try {
                     modificar_roles_menu mr = new modificar_roles_menu(appName,userName,rolName,menuName,db);
                     mr.setVisible(true);
@@ -191,7 +192,7 @@ public class main_menu_screen extends javax.swing.JFrame {
         }
             
             
-        
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

@@ -102,6 +102,23 @@ public class Database {
         boolean intento = this.login_attempt(username, password);
         return intento;
     }
+    public boolean adminLogin(String username,String password){
+        try (Connection connection = DriverManager.getConnection(url,user,password)){             
+            String query = "SELECT * FROM admin";
+            PreparedStatement statement = connection.prepareStatement(query);           
+            ResultSet rs = statement.executeQuery();            
+            while(rs.next()){
+                if(rs.getString("alias").compareTo(username)==0 && BCrypt.checkpw(password,rs.getString("password"))){
+                    return true;                    
+                }
+            }
+        }         
+        catch (SQLException e) {
+            System.out.println("Connection failure.");
+            return false;
+        } 
+        return false;        
+    }
     
     public boolean login_attempt(String btn1,String btn2) throws SQLException{
         try (Connection connection = DriverManager.getConnection(url,user,password)){             
@@ -306,7 +323,11 @@ public class Database {
         }
         return null;       
     }
-    
+    /**
+     * Retorna todos los Alias (de Usuarios) que estan relacionados con un Menu
+     * @param idmenu
+     * @return 
+     */
     public HashSet<String> getAliases(int idmenu){
         try (Connection connection = DriverManager.getConnection(url,user,password)){
             String query_desc = "SELECT x.user FROM menurol x WHERE x.idrol = ?";
@@ -325,7 +346,15 @@ public class Database {
         }
         return new HashSet<String>();         
     }
-    
+    /**
+     * Agrega un Usuario a un Menu con el Rol basico "Usuario" (id 110)
+     * @param appname
+     * @param username
+     * @param rolname
+     * @param menuname
+     * @param alias
+     * @return 
+     */
     public boolean agregarUsuarioAMenu(String appname,String username,String rolname,String menuname,String alias){
         try (Connection connection = DriverManager.getConnection(url,user,password)){
             String query = "SELECT x.* FROM menurol x WHERE (x.user = ?) AND (x.idmenu = ?)";
@@ -557,6 +586,136 @@ public class Database {
             return null;
             
         }
+    }
+    /**
+     * Retorna los Usuarios que estan relacionados con un Menu dado
+     * @param idmenu
+     * @return 
+     */
+    public ResultSet getUsuariosMenu(int idmenu){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.* FROM menurol x WHERE x.idmenu = ?";
+            PreparedStatement stmt = c.prepareStatement(query);        
+            stmt.setInt(1,idmenu);
+            ResultSet rs = stmt.executeQuery();           
+            return rs;
+        }catch(SQLException e){
+            return null;            
+        }
+    }
+    /**
+     * Un Admin crea un usuario, siempre que no este repetido para esa CI.
+     * @param ci
+     * @param username
+     * @param password
+     * @param admin
+     * @return 
+     */
+    public boolean crearUsuario(Integer ci,String username,String password,String admin){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT x.* FROM usuario x WHERE (x.ci = ?) AND (x.alias = ?) AND (x.ci in (SELECT x.ci FROM persona WHERE x.ci = ?))";
+            PreparedStatement stmt = c.prepareStatement(query);     
+            stmt.setInt(1,ci);
+            stmt.setString(2,username);
+            stmt.setInt(3,ci);
+            ResultSet rs = stmt.executeQuery();           
+            if(rs.next()){
+                return false;
+            }else{
+                String user_query = "INSERT INTO usuario(alias,ci,quienlocreo,estado,password) VALUES(?,?,?,?,?);";
+                PreparedStatement user_statement = c.prepareStatement(user_query);
+                user_statement.setString(1,username);
+                user_statement.setInt(2,ci);
+                user_statement.setString(3,"DIOS");
+                user_statement.setString(4,"Habilitado");
+                user_statement.setString(5,BCrypt.hashpw(password,BCrypt.gensalt()));            
+                int user_query_result = user_statement.executeUpdate();
+                //AUDITORIA ....
+            }
+        }catch(SQLException e){
+            return false;           
+        }         
+        return false;
+    }
+    /**
+     * Obtiene todos los Usuarios y sus Estados
+     * @return 
+     */
+    public ResultSet getUsuarios() {
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT alias,estado FROM usuario";
+            PreparedStatement stmt = c.prepareStatement(query);                  
+            ResultSet rs = stmt.executeQuery();           
+            return rs;
+        }catch(SQLException e){
+            return null;            
+        }        
+    }
+    /**
+     * Habilita/Deshabilita un Usuario
+     * @param alias
+     * @param admin el responsable
+     * @param habilitar
+     * @return 
+     */
+    public boolean habilitarUsuario(String alias,String admin,boolean habilitar){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "UPDATE usuario SET estado=? WHERE alias = ?;";
+            PreparedStatement stmt = c.prepareStatement(query);
+            if(habilitar){
+               stmt.setString(1,"Habilitado"); 
+            }else{
+                stmt.setString(1,"Bloqueado");
+            }            
+            stmt.setString(2,alias);            
+            int resultado = stmt.executeUpdate();
+            //AUDITORIA ....
+            return resultado >= 1;
+        }catch(SQLException e){
+            return false;
+            
+        }            
+    }
+    /**
+     * Habilita/Deshabilita un Rol a un Usuario en un Menu.
+     * @param vinculo
+     * @param admin el responsable
+     * @param habilitar
+     * @return 
+     */
+    public boolean habilitarRolUsuarioMenu(int vinculo,String admin,boolean habilitar){
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "UPDATE menurol SET estado=?,adminautoriza=? WHERE vinculo = ?;";
+            PreparedStatement stmt = c.prepareStatement(query);
+            if(habilitar){
+               stmt.setString(1,"Habilitado"); 
+            }else{
+                stmt.setString(1,"Bloqueado");
+            }          
+            stmt.setString(2,admin);
+            stmt.setInt(3,vinculo);            
+            int resultado = stmt.executeUpdate();
+            //AUDITORIA ....
+            return resultado >= 1;
+        }catch(SQLException e){
+            return false;
+            
+        } 
+        
+    }
+    /**
+    * Metodo que devuelve la tabla menurol entera
+    * @return 
+    */
+    public ResultSet getMenuRol() {
+        try(Connection c = DriverManager.getConnection(url,user,password)){
+            String query = "SELECT * FROM menurol";
+            PreparedStatement stmt = c.prepareStatement(query);                  
+            ResultSet rs = stmt.executeQuery();           
+            return rs;
+        }catch(SQLException e){
+            return null;            
+        }          
     }
     
 }

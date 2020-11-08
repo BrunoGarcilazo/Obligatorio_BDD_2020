@@ -63,8 +63,8 @@ public class register_utils {
             PreparedStatement user_statement = connection.prepareStatement(user_query);
             user_statement.setString(1,data[7]);
             user_statement.setInt(2,Integer.parseInt(data[0]));
-            user_statement.setString(3,"none");
-            user_statement.setString(4,"En Espera");
+            user_statement.setString(3,"N/A");
+            user_statement.setString(4,"Habilitado");
             user_statement.setString(5,BCrypt.hashpw(data[8],BCrypt.gensalt()));
             
             int user_query_result = user_statement.executeUpdate();

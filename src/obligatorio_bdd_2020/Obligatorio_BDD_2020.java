@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import utils.BCrypt;
 /**
  *
  * @author bruno
@@ -31,7 +32,7 @@ public class Obligatorio_BDD_2020{
      * @param args the command line arguments
      * @throws java.sql.SQLException
      */
-    public static void main(String[] args) throws SQLException{        
+    public static void main(String[] args) throws SQLException{       
         Database database = new Database();
     }
 

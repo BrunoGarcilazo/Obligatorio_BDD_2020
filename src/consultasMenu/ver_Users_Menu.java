@@ -5,6 +5,7 @@
  */
 package consultasMenu;
 
+import java.sql.ResultSet;
 import java.util.HashSet;
 
 /**
