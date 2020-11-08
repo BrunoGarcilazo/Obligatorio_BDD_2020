@@ -45,8 +45,6 @@ public class modificar_roles_menu extends javax.swing.JFrame {
         
         jComboBox1.removeAllItems();
         jComboBox1.addItem("Usuario");
-        jComboBox1.addItem("Editor de Roles");
-        jComboBox1.addItem("Editor de Usuarios");
         jComboBox1.addItem("Administrador de Roles");
         jComboBox1.addItem("Administrador de Usuarios");
         
@@ -107,6 +105,11 @@ public class modificar_roles_menu extends javax.swing.JFrame {
         jLabel5.setText("Usuario");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jLabel6.setText("Rol");
 
@@ -260,6 +263,10 @@ public class modificar_roles_menu extends javax.swing.JFrame {
             jLabel7.setText("Status: ese usuario no tiene ese rol.");
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
